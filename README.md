@@ -20,6 +20,8 @@ EndEvent
 ## Demo
 Clips from my mod [All For One Mage]():
 
+![bruh](clips/combo.gif)
+
 ## Mods that require this
 * [All For One Mage]()
 
