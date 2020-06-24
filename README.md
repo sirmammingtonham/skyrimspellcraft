@@ -1,5 +1,6 @@
 # Skyrim Spell Craft Functions SE 🧙‍
 [SKSE64](https://skse.silverlock.org/) plugin that adds more papyrus functions for the manipulation of spells in Skyrim Special Edition.
+https://www.nexusmods.com/skyrimspecialedition/mods/37493
 
 ## Usage
 Check [SpellCraft.psc](SpellCraft.psc) for usage.
@@ -18,12 +19,12 @@ EndEvent
 ```
 
 ## Demo
-Clips from my mod [All For One Mage]():
+Clips from my mod [All For One Mage](https://www.nexusmods.com/skyrimspecialedition/mods/37515):
 
 ![bruh](clips/combo.gif)
 
 ## Mods that require this
-* [All For One Mage]()
+* [All For One Mage](https://www.nexusmods.com/skyrimspecialedition/mods/37515)
 
 ### Notes
 Not an actual mod! Just a modders' resource. Not extensively tested either so submit an [issue](https://github.com/sirmammingtonham/skyrimspellcraft/issues) if you notice any bugs.
