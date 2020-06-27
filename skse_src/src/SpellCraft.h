@@ -5,6 +5,9 @@
 #include "skse64/GameObjects.h"
 #include "skse64/GameReferences.h"
 #include "skse64/GameRTTI.h"
+#include "skse64/PluginAPI.h"
+
+#include "SpellSerialization.h"
 
 // read GameObjects.h if you wanna see how i found the variables to modify for these functions
 namespace SpellCraft
@@ -19,13 +22,13 @@ namespace SpellCraft
 	bool SetSpellNthMagicEffectDur(StaticFunctionTag* base, SpellItem* akSpell, UInt32 dur, UInt32 index);
 	bool SetSpellNthMagicEffectArea(StaticFunctionTag* base, SpellItem* akSpell, UInt32 area, UInt32 index);
 	bool SetSpellNthMagicEffectCost(StaticFunctionTag* base, SpellItem* akSpell, float cost, UInt32 index);
+	bool SetSpellNthMagicEffectDelivery(StaticFunctionTag* base, SpellItem* akSpell, UInt32 akDelivery, UInt32 index);
 
 	float GetSpellNthMagicEffectCost(StaticFunctionTag* base, SpellItem* akSpell, UInt32 index);
 	
 	bool SetSpellType(StaticFunctionTag* base, SpellItem* akSpell, UInt32 akType);
 	bool SetSpellCastType(StaticFunctionTag* base, SpellItem* akSpell, UInt32 akType);
 	bool SetSpellCastTime(StaticFunctionTag* base, SpellItem* akSpell, float akTime);
-	bool SetSpellDelivery(StaticFunctionTag* base, SpellItem* akSpell, UInt32 akType);
 	bool SetSpellPerk(StaticFunctionTag* base, SpellItem* akSpell, BGSPerk* akPerk);
 	bool SetSpellCost(StaticFunctionTag* base, SpellItem* akSpell, UInt32 akCost);
 	bool SetSpellName(StaticFunctionTag* base, SpellItem* akSpell, BSFixedString name);
@@ -43,4 +46,7 @@ namespace SpellCraft
 	bool CombineSpells(StaticFunctionTag* base, SpellItem* base_spell, VMArray<SpellItem*> spells, BSFixedString name);
 
 	bool RegisterFuncs(VMClassRegistry* registry);
+
+	void SaveCallback(SKSESerializationInterface* a_intfc);
+	void LoadCallback(SKSESerializationInterface* a_intfc);
 }

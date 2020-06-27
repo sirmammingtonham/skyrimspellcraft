@@ -5,6 +5,7 @@ template <> void UnpackValue(VMArray<SpellItem*>* dst, VMValue* src) {
 }
 
 namespace SpellCraft {
+	static std::set<SpellItem*> modifiedSpells;
 	// adds effect to spell
 	bool SpellAddEffect(StaticFunctionTag* base, SpellItem* akSpell, EffectSetting* akEffect, float mag, UInt32 dur, UInt32 area, float cost) {
 		if (!akSpell || !akEffect)
@@ -18,6 +19,7 @@ namespace SpellCraft {
 		new_effect->cost = cost;
 
 		akSpell->effectItemList.Push(new_effect);
+		modifiedSpells.insert(akSpell);
 		return true;
 	}
 
@@ -26,30 +28,42 @@ namespace SpellCraft {
 		if (!akSpell || !akEffect || index >= akSpell->effectItemList.count)
 			return false;
 		akSpell->effectItemList[index]->mgef = akEffect;
+		modifiedSpells.insert(akSpell);
 		return true;
 	}
 	bool SetSpellNthMagicEffectMag(StaticFunctionTag* base, SpellItem* akSpell, float mag, UInt32 index) {
 		if (!akSpell || index >= akSpell->effectItemList.count)
 			return false;
 		akSpell->effectItemList[index]->magnitude = mag;
+		modifiedSpells.insert(akSpell);
 		return true;
 	}
 	bool SetSpellNthMagicEffectDur(StaticFunctionTag* base, SpellItem* akSpell, UInt32 dur, UInt32 index) {
 		if (!akSpell || index >= akSpell->effectItemList.count)
 			return false;
 		akSpell->effectItemList[index]->duration = dur;
+		modifiedSpells.insert(akSpell);
 		return true;
 	}
 	bool SetSpellNthMagicEffectArea(StaticFunctionTag* base, SpellItem* akSpell, UInt32 area, UInt32 index) {
 		if (!akSpell || index >= akSpell->effectItemList.count)
 			return false;
 		akSpell->effectItemList[index]->area = area;
+		modifiedSpells.insert(akSpell);
 		return true;
 	}
 	bool SetSpellNthMagicEffectCost(StaticFunctionTag* base, SpellItem* akSpell, float cost, UInt32 index) {
 		if (!akSpell || index >= akSpell->effectItemList.count)
 			return false;
 		akSpell->effectItemList[index]->cost = cost;
+		modifiedSpells.insert(akSpell);
+		return true;
+	}
+	bool SetSpellNthMagicEffectDelivery(StaticFunctionTag* base, SpellItem* akSpell, UInt32 akDelivery, UInt32 index) {
+		if (!akSpell || index >= akSpell->effectItemList.count)
+			return false;
+		akSpell->effectItemList[index]->mgef->properties.deliveryType = akDelivery;
+		modifiedSpells.insert(akSpell);
 		return true;
 	}
 
@@ -65,42 +79,42 @@ namespace SpellCraft {
 		if (!akSpell)
 			return false;
 		akSpell->data.type = akType;
+		modifiedSpells.insert(akSpell);
 		return true;
 	}
 	bool SetSpellCastType(StaticFunctionTag* base, SpellItem* akSpell, UInt32 akType) {
 		if (!akSpell)
 			return false;
-		akSpell->data.type = akType;
+		akSpell->data.castType = akType;
+		modifiedSpells.insert(akSpell);
 		return true;
 	}
 	bool SetSpellCastTime(StaticFunctionTag* base, SpellItem* akSpell, float akTime) {
 		if (!akSpell)
 			return false;
 		akSpell->data.castTime = akTime;
-		return true;
-	}
-	bool SetSpellDelivery(StaticFunctionTag* base, SpellItem* akSpell, UInt32 akType) {
-		if (!akSpell)
-			return false;
-		akSpell->data.type = akType;
+		modifiedSpells.insert(akSpell);
 		return true;
 	}
 	bool SetSpellPerk(StaticFunctionTag* base, SpellItem* akSpell, BGSPerk* akPerk) {
 		if (!akSpell)
 			return false;
 		akSpell->data.spellPerk= akPerk;
+		modifiedSpells.insert(akSpell);
 		return true;
 	}
 	bool SetSpellCost(StaticFunctionTag* base, SpellItem* akSpell, UInt32 akCost) {
 		if (!akSpell)
 			return false;
 		akSpell->data.unk00.cost = akCost;
+		modifiedSpells.insert(akSpell);
 		return true;
 	}
 	bool SetSpellName(StaticFunctionTag* base, SpellItem* akSpell, BSFixedString name) {
 		if (!akSpell)
 			return false;
 		akSpell->fullName.name = name;
+		modifiedSpells.insert(akSpell);
 		return true;
 	}
 
@@ -126,6 +140,7 @@ namespace SpellCraft {
 		spellA->keyword = spellB->keyword;
 		spellA->hostile = spellB->hostile;
 		spellA->effectTemplate = spellB->effectTemplate;
+
 		// copy spellitem vars
 		spellA->equipType = spellB->equipType;
 		spellA->dispObj = spellB->dispObj;
@@ -138,6 +153,7 @@ namespace SpellCraft {
 	}
 
 	bool CopySpell(StaticFunctionTag* base, SpellItem* spellA, SpellItem* spellB) {
+		modifiedSpells.insert(spellA);
 		return _copySpell(spellA, spellB);
 	}
 
@@ -247,12 +263,10 @@ namespace SpellCraft {
 			_MESSAGE("NO SPELLS TO COMBINE");
 			return false;
 		}
-		// _MESSAGE("FIRST SPELL = %s", new_spell->fullName.name);
-		_copySpell(akBase, new_spell); //->CopyFrom(new_spell);
-		_MESSAGE("BASE SPELL = %s", new_spell->fullName.name);
+
+		_copySpell(akBase, new_spell); 
 		akBase->fullName.name = akName;
-		// _MESSAGE("%d", akBase->effectItemList.capacity);
-		// _MESSAGE("%d", akSpells.Length());
+
 		for (UInt32 i=0; i < akSpells.Length(); ++i) {
 			akSpells.Get(&new_spell, i);
 			if (!new_spell) {
@@ -263,13 +277,8 @@ namespace SpellCraft {
 				_MESSAGE("added effect %s", new_spell->effectItemList[j]->mgef->fullName.GetName());
 			}
 		}
-		// _MESSAGE("%d", akBase->effectItemList.capacity);
-		// _MESSAGE("Combo effects (%d):", akBase->effectItemList.count);
-		// for (UInt32 i=0; i < akBase->effectItemList.count; ++i) {
-			// _MESSAGE("%s, duration: %d", akBase->effectItemList[i]->mgef->fullName.GetName(), akBase->effectItemList[i]->duration);
-		// }
-		//_MESSAGE("%s", akBase->effectTemplate->fullName.GetName());
-		// _MESSAGE("Finished listing effects");
+
+		modifiedSpells.insert(akBase);
 		return true;
 	}
 
@@ -296,6 +305,8 @@ namespace SpellCraft {
 			new NativeFunction3 <StaticFunctionTag, bool, SpellItem*, UInt32, UInt32>("SetSpellNthMagicEffectArea", "SpellCraft", SpellCraft::SetSpellNthMagicEffectArea, registry));
 		registry->RegisterFunction(
 			new NativeFunction3 <StaticFunctionTag, bool, SpellItem*, float, UInt32>("SetSpellNthMagicEffectCost", "SpellCraft", SpellCraft::SetSpellNthMagicEffectCost, registry));
+		registry->RegisterFunction(
+			new NativeFunction3 <StaticFunctionTag, bool, SpellItem*, UInt32, UInt32>("SetSpellNthMagicEffectDelivery", "SpellCraft", SpellCraft::SetSpellNthMagicEffectDelivery, registry));
 		
 		registry->RegisterFunction(
 			new NativeFunction2 <StaticFunctionTag, float, SpellItem*, UInt32>("GetSpellNthMagicEffectCost", "SpellCraft", SpellCraft::GetSpellNthMagicEffectCost, registry));
@@ -306,8 +317,6 @@ namespace SpellCraft {
 			new NativeFunction2 <StaticFunctionTag, bool, SpellItem*, UInt32>("SetSpellCastType", "SpellCraft", SpellCraft::SetSpellCastType, registry));
 		registry->RegisterFunction(
 			new NativeFunction2 <StaticFunctionTag, bool, SpellItem*, float>("SetSpellCastTime", "SpellCraft", SpellCraft::SetSpellCastTime, registry));
-		registry->RegisterFunction(
-			new NativeFunction2 <StaticFunctionTag, bool, SpellItem*, UInt32>("SetSpellDelivery", "SpellCraft", SpellCraft::SetSpellDelivery, registry));
 		registry->RegisterFunction(
 			new NativeFunction2 <StaticFunctionTag, bool, SpellItem*, BGSPerk*>("SetSpellPerk", "SpellCraft", SpellCraft::SetSpellPerk, registry));
 		registry->RegisterFunction(
@@ -336,5 +345,64 @@ namespace SpellCraft {
 		registry->RegisterFunction(
 			new NativeFunction3 <StaticFunctionTag, bool, SpellItem*, VMArray<SpellItem*>, BSFixedString>("CombineSpells", "SpellCraft", SpellCraft::CombineSpells, registry));
 		return true;
+	}
+
+	// serializes and saves the data in our modified spells set
+	void SaveCallback(SKSESerializationInterface* a_intfc) {
+		if (a_intfc->OpenRecord('SP3L', 1)) {
+			std::size_t size = modifiedSpells.size();
+			_MESSAGE("Saving %d spells", size);
+			if (a_intfc->WriteRecordData(&size, sizeof(size))) {
+				for (SpellItem* elem : modifiedSpells) {
+					SpellSerializer::serializeSpell(a_intfc, elem);
+				}
+			}
+		}
+		else {
+			_ERROR("Failed to open record for spells!");
+		}
+	}
+
+	void LoadCallback(SKSESerializationInterface* a_intfc) {
+		UInt32 type, version, length;
+		while (a_intfc->GetNextRecordInfo(&type, &version, &length)) {
+			switch (type) {
+			case 'SP3L':
+			{
+				std::size_t size;
+				a_intfc->ReadRecordData(&size, sizeof(size));
+				_MESSAGE("%d elements to load", size);
+				for (UInt32 i=0; i<size; ++i) {
+					UInt32 id;
+					if (a_intfc->ReadRecordData(&id, sizeof(id))) {
+						if (a_intfc->ResolveFormId(id, &id)) {
+							SpellItem* spell = dynamic_cast<SpellItem*>(LookupFormByID(id));
+							if (spell) {
+								_MESSAGE("loaded id %d, %s", spell->formID, spell->fullName.name);
+								SpellSerializer::deserializeSpell(a_intfc, spell);
+								modifiedSpells.insert(spell);
+							}
+							else {
+								_ERROR("no spell loaded");
+								break;
+							}
+						}
+						else {
+							_ERROR("Couldn't resolve form id, maybe something deleted it?");
+							break;
+						}
+					}
+					else {
+						_ERROR("Couldn't read spell id!");
+						break;
+					}
+				}
+			}
+			break;
+			default:
+				_ERROR("Unrecognized signature type!");
+				break;
+			}
+		}
 	}
 }

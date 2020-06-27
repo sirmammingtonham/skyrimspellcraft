@@ -155,15 +155,14 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="SpellCraft.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\SpellCraft.cpp" />
+    <ClCompile Include="src\SpellSerialization.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="SpellCraft.h" />
     <ClInclude Include="include\version.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="version.rc" />
+    <ClInclude Include="src\SpellCraft.h" />
+    <ClInclude Include="src\SpellSerialization.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -15,7 +15,10 @@
     <ClCompile Include="src\main.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="SpellCraft.cpp">
+    <ClCompile Include="src\SpellCraft.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SpellSerialization.cpp">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>
@@ -23,11 +26,11 @@
     <ClInclude Include="include\version.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="SpellCraft.h">
+    <ClInclude Include="src\SpellCraft.h">
       <Filter>src</Filter>
     </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="version.rc" />
+    <ClInclude Include="src\SpellSerialization.h">
+      <Filter>src</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
