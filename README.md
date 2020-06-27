@@ -5,6 +5,8 @@ https://www.nexusmods.com/skyrimspecialedition/mods/37493
 ## Usage
 Check [SpellCraft.psc](SpellCraft.psc) for usage.
 
+v1.0.1 now allows for persistent spell modifications through the skse co-save!
+
 ## Example
 The following papyrus snippet creates a spell effect that will add all spells from a target actor to the caster:
 ```
